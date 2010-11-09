@@ -21,9 +21,9 @@ function! s:ShowFavStar(...)
     let actions = item.findAll('div', {"class": "avatarList"})
     for action in actions
       let line = ''
-      if actions[0].attr['id'] =~ "^faved_by_"
+      if action.attr['id'] =~ "^faved_by_"
         let line .= "FAV:"
-      elseif actions[0].attr['id'] =~ "^rt_by_"
+      elseif action.attr['id'] =~ "^rt_by_"
         let line .= "RT:"
       endif
       for a in action.findAll('img')
