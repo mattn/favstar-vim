@@ -1,0 +1,20 @@
+# Description
+  viewer for favstar.fm
+
+# Usage
+
+    :FavStar otsune
+  Show FAV/RTs for otsune on twitter.
+
+  If you want to set default user, set following in your vimrc.
+
+    :set g:favstar_user = 'otsune'
+
+  Then you can see the result as below.
+
+    :FavStar
+
+
+# Author
+  * mattn
+
