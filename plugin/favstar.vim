@@ -8,12 +8,11 @@ function! s:ShowFavStar(...)
     echohl None
     return
   endif
-  let yql = "select * from html where url = 'http://favstar.fm/users/".user."/recent' and xpath = '//div[@class=\"tweetContainer\"]'"
-  let res = http#get("http://query.yahooapis.com/v1/public/yql", {'q': yql})
-  let dom = xml#parse(res.content)
-  for item in dom.childNode('results').childNodes('div')
+  let res = http#get("http://favstar.fm/users/".user."/recent")
+  let dom = xml#parse(iconv(res.content, 'utf-8', &encoding))
+  for item in dom.findAll({'class': 'tweetContainer'})
     let tweet = item.find('div', {"class": "theTweet"})
-    let text = substitute(tweet.childNode('p').value(), "\n", " ", "g")
+    let text = substitute(tweet.value(), "\n", " ", "g")
     let text = substitute(text, "^ *", "", "")
     echohl Function
     echo text
