@@ -1,7 +1,7 @@
 # favstar.vim
 
 ### Description
-  viewer for favstar.fm
+  viewer for [favstar.fm](http://favstar.fm/)
 
 ### Usage
 
