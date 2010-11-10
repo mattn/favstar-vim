@@ -1,7 +1,9 @@
-# Description
+# favstar.vim
+
+## Description
   viewer for favstar.fm
 
-# Usage
+## Usage
 
     :FavStar otsune
   Show FAV/RTs for otsune on twitter.
@@ -14,7 +16,6 @@
 
     :FavStar
 
-
-# Author
+## Author
   * mattn
 
