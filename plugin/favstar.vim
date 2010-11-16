@@ -9,7 +9,9 @@ function! s:ShowFavStar(...)
     return
   endif
   let res = http#get("http://favstar.fm/users/".user."/recent")
-  let dom = xml#parse(iconv(res.content, 'utf-8', &encoding))
+  let res.content = iconv(res.content, 'utf-8', &encoding)
+  let res.content = substitute(res.content, '<\(br\|meta\|link\)\s*>', '<\1/>', 'g')
+  let dom = xml#parse(res.content)
   for item in dom.findAll({'class': 'tweetContainer'})
     let tweet = item.find('div', {"class": "theTweet"})
     let text = substitute(tweet.value(), "\n", " ", "g")
