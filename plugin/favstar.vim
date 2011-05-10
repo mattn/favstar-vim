@@ -10,7 +10,7 @@ function! s:ShowFavStar(...)
   endif
   let res = http#get("http://favstar.fm/users/".user."/recent")
   let res.content = iconv(res.content, 'utf-8', &encoding)
-  let res.content = substitute(res.content, '<\(br\|meta\|link\)\s*>', '<\1/>', 'g')
+  let res.content = substitute(res.content, '<\(br\|meta\|link\|hr\)\s*>', '<\1/>', 'g')
   let dom = xml#parse(res.content)
 
   let nodes = dom.findAll({'class': 'tweetWithStats'})
