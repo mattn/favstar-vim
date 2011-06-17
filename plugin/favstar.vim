@@ -25,7 +25,7 @@ function! s:ShowFavStar(...)
     let tweet = item.find('div', {"class": "theTweet"})
     let text = substitute(tweet.value(), "\n", " ", "g")
     let text = substitute(text, "^ *", "", "")
-	let favinfo = {"text": text, "favs": [], "rts": []}
+    let favinfo = {"text": text, "favs": [], "rts": []}
     let actions = item.findAll('div', {"class": "avatarList"})
     for action in actions
       let line = ''
@@ -33,46 +33,66 @@ function! s:ShowFavStar(...)
         for a in action.findAll('img')
           call add(favinfo.favs, a.attr['alt'])
         endfor
+        let other = action.find('a', {'class': 'otherCount'})
+        if !empty(other)
+           let ll = matchstr(other.attr['onclick'], '\(\[.*\]\)')
+           if len(ll)
+             for o in json#decode(ll)
+               call add(favinfo.favs, o[0])
+             endfor
+           endif
+        endif
       elseif action.attr['id'] =~ "^rt_by_"
         for a in action.findAll('img')
           call add(favinfo.rts, a.attr['alt'])
         endfor
+        let other = action.find('a', {'class': 'otherCount'})
+        if !empty(other)
+           let ll = matchstr(other.attr['onclick'], '\(\[.*\]\)')
+           if len(ll)
+             for o in json#decode(ll)
+               call add(favinfo.rts, o[0])
+             endfor
+           endif
+        endif
       endif
     endfor
-	call add(favinfos, favinfo)
+    call add(favinfos, favinfo)
     if !empty(pb) | call pb.incr() | endif
   endfor
   if !empty(pb) | call pb.restore() | endif
   if len(favinfos) == 0
     let node = dom.find({'class': 'content'})
-	let text = node.value()
-	let text = substitute(text, "[\t ]*\n[\t ]*", " ", "g")
-	let text = substitute(text, "^[\t ]*", "", "g")
-	echomsg text
+    let text = node.value()
+    let text = substitute(text, "[\t ]*\n[\t ]*", " ", "g")
+    let text = substitute(text, "^[\t ]*", "", "g")
+    echomsg text
     return
   endif
   for favinfo in favinfos
     echohl Function
     echo favinfo.text
     echohl None
-	if len(favinfo.favs)
-	  echon "\nFAV:"
+    if len(favinfo.favs)
+      echon "\nFAV:"
       for fav in favinfo.favs
         echohl Statement
         echon " " . fav
         echohl None
-	  endfor
+      endfor
     endif
-	if len(favinfo.rts)
-	  echon "\nRT:"
+    if len(favinfo.rts)
+      echon "\nRT:"
       for rt in favinfo.rts
         echohl Statement
         echon " " . rt
         echohl None
-	  endfor
+      endfor
     endif
     echo "\n"
   endfor
 endfunction
 
 command! -nargs=? FavStar call <SID>ShowFavStar(<f-args>)
+
+" vim:set et:
