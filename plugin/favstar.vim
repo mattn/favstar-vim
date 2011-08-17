@@ -62,11 +62,16 @@ function! s:ShowFavStar(...)
   endfor
   if !empty(pb) | call pb.restore() | endif
   if len(favinfos) == 0
-    let node = dom.find({'class': 'content'})
-    let text = node.value()
-    let text = substitute(text, "[\t ]*\n[\t ]*", " ", "g")
-    let text = substitute(text, "^[\t ]*", "", "g")
-    echomsg text
+    let node = dom.find('div', {'class': 'content'})
+    if empty(node)
+      let node = dom.find('div', {'id': 'streamTitle'})
+    endif
+    if !empty(node)
+      let text = node.value()
+      let text = substitute(text, "[\t ]*\n[\t ]*", " ", "g")
+      let text = substitute(text, "^[\t ]*", "", "g")
+      echomsg text
+    endif
     return
   endif
   for favinfo in favinfos
