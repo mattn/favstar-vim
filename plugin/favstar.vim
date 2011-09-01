@@ -76,23 +76,25 @@ function! s:ShowFavStar(...)
   endif
   for favinfo in favinfos
     echohl Function
-    echo favinfo.text
+    echo favinfo.text."\n"
     echohl None
     if len(favinfo.favs)
-      echon "\nFAV(".len(favinfo.favs)."):"
+      echon "FAV(".len(favinfo.favs)."):"
       for fav in favinfo.favs
         echohl Statement
         echon " " . fav
         echohl None
       endfor
+      echo ""
     endif
     if len(favinfo.rts)
-      echon "\nRT(".len(favinfo.rts)."):"
+      echon "RT(".len(favinfo.rts)."):"
       for rt in favinfo.rts
         echohl Statement
         echon " " . rt
         echohl None
       endfor
+      echo ""
     endif
     echo "\n"
   endfor
