@@ -1,5 +1,5 @@
-function! s:ShowFavStar(...)
-  let user = a:0 > 0 ? a:1 : exists('g:favstar_user') ? g:favstar_user : ''
+function! s:ShowFavStar(bang, user)
+  let user = len(a:user) > 0 ? a:user : exists('g:favstar_user') ? g:favstar_user : ''
   if len(user) == 0
     echohl WarningMsg
     echo "Usage:"
@@ -8,7 +8,15 @@ function! s:ShowFavStar(...)
     echohl None
     return
   endif
-  let res = http#get("http://favstar.fm/users/".user."/recent")
+  let url = "http://favstar.fm/users/".user."/recent"
+  if len(a:bang) > 0
+    try
+      call OpenBrowser(url)
+    catch
+    endtry
+    return
+  endif
+  let res = http#get(url)
   let res.content = iconv(res.content, 'utf-8', &encoding)
   let res.content = substitute(res.content, '<\(br\|meta\|link\|hr\)\s*>', '<\1/>', 'g')
   let dom = xml#parse(res.content)
@@ -42,6 +50,7 @@ function! s:ShowFavStar(...)
              endfor
            endif
         endif
+        let favinfo.favcount = action.find('span', {"class": "count"}).value()
       elseif action.attr['id'] =~ "^rt_by_"
         for a in action.findAll('img')
           call add(favinfo.rts, a.attr['alt'])
@@ -55,6 +64,7 @@ function! s:ShowFavStar(...)
              endfor
            endif
         endif
+        let favinfo.rtcount = action.find('span', {"class": "count"}).value()
       endif
     endfor
     call add(favinfos, favinfo)
@@ -79,7 +89,7 @@ function! s:ShowFavStar(...)
     echo favinfo.text."\n"
     echohl None
     if len(favinfo.favs)
-      echon "FAV(".len(favinfo.favs)."):"
+      echon "FAV(".(0+favinfo.favcount)."):"
       for fav in favinfo.favs
         echohl Statement
         echon " " . fav
@@ -88,7 +98,7 @@ function! s:ShowFavStar(...)
       echo ""
     endif
     if len(favinfo.rts)
-      echon "RT(".len(favinfo.rts)."):"
+      echon "RT(".(0+favinfo.rtcount)."):"
       for rt in favinfo.rts
         echohl Statement
         echon " " . rt
@@ -100,6 +110,6 @@ function! s:ShowFavStar(...)
   endfor
 endfunction
 
-command! -nargs=? FavStar call <SID>ShowFavStar(<f-args>)
+command! -nargs=? -bang FavStar call <SID>ShowFavStar("<bang>", <q-args>)
 
 " vim:set et:
