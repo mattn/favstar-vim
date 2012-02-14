@@ -78,8 +78,8 @@ function! s:ShowFavStar(bang, user)
     endif
     if !empty(node)
       let text = node.value()
-      let text = substitute(text, "[\t ]*\n[\t ]*", " ", "g")
-      let text = substitute(text, "^[\t ]*", "", "g")
+      let text = substitute(text, '[\t\r\n ]\+', ' ', 'g')
+      let text = matchstr(text, '^\s*\zs.*\ze\s*$')
       echomsg text
     endif
     return
