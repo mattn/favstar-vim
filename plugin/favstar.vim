@@ -16,10 +16,10 @@ function! s:ShowFavStar(bang, user)
     endtry
     return
   endif
-  let res = http#get(url)
+  let res = webapi#http#get(url)
   let res.content = iconv(res.content, 'utf-8', &encoding)
   let res.content = substitute(res.content, '<\(br\|meta\|link\|hr\)\s*>', '<\1/>', 'g')
-  let dom = xml#parse(res.content)
+  let dom = webapi#xml#parse(res.content)
 
   let nodes = dom.findAll({'class': 'tweetWithStats'})
   try
@@ -45,7 +45,7 @@ function! s:ShowFavStar(bang, user)
         if !empty(other)
            let ll = matchstr(other.attr['onclick'], '\(\[.*\]\)')
            if len(ll)
-             for o in json#decode(ll)
+             for o in webapi#json#decode(ll)
                call add(favinfo.favs, o[0])
              endfor
            endif
@@ -59,7 +59,7 @@ function! s:ShowFavStar(bang, user)
         if !empty(other)
            let ll = matchstr(other.attr['onclick'], '\(\[.*\]\)')
            if len(ll)
-             for o in json#decode(ll)
+             for o in webapi#json#decode(ll)
                call add(favinfo.rts, o[0])
              endfor
            endif
