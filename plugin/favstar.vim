@@ -21,6 +21,10 @@ function! s:ShowFavStar(bang, user)
   let res = webapi#http#get(url, '', {
   \ 'User-Agent': 'Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_2 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5'
   \})
+  if res.header[0] !~ '200'
+    redraw | echomsg res.header[0]
+    return
+  endif
  
   let res.content = iconv(res.content, 'utf-8', &encoding)
   let res.content = substitute(res.content, '<\(br\|meta\|link\|hr\)\s*>', '<\1/>', 'g')
