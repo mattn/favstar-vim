@@ -16,12 +16,15 @@ function! s:ShowFavStar(bang, user)
     endtry
     return
   endif
+  echohl WarningMsg
+  redraw | echo "fetching data..."
   let res = webapi#http#get(url, '', {
   \ 'User-Agent': 'Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_2 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5'
   \})
  
   let res.content = iconv(res.content, 'utf-8', &encoding)
   let res.content = substitute(res.content, '<\(br\|meta\|link\|hr\)\s*>', '<\1/>', 'g')
+  redraw | echo "parsing data..."
   let dom = webapi#xml#parse(res.content)
 
   let nodes = dom.findAll({'class': 'fs-tweet'})
@@ -35,15 +38,15 @@ function! s:ShowFavStar(bang, user)
     endfunction
   endtry
 
+  redraw | echo ""
   let favinfos = []
   for item in nodes
-    let id = webapi#json#decode(item.attr['data-model'])['tweet_id']
-    let tweet = item.find('p', {"class": "fs-tweet-text"})
-    let text = substitute(tweet.value(), "\n", " ", "g")
+    let info = webapi#json#decode(item.attr['data-model'])
+    let id = info['tweet_id']
+    let text = substitute(info['text'], "\n", " ", "g")
     let text = substitute(text, "^ *", "", "")
     let favinfo = {"text": text, "favs": [], "rts": [], "favcount": 0, "rtcount": 0}
     
-    "webapi#get(printf)
     let favs = item.find('div', {"data-type": "favs"})
     if !empty(favs)
       let favinfo.favcount = 0 + favs.find("li", {"class": "fs-total"}).value()
@@ -62,6 +65,7 @@ function! s:ShowFavStar(bang, user)
     call pb.incr()
   endfor
   call pb.restore()
+  redraw!
   for favinfo in favinfos
     echohl Function
     echo favinfo.text."\n"
