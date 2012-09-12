@@ -2,13 +2,13 @@ function! s:ShowFavStar(bang, user)
   let user = len(a:user) > 0 ? a:user : exists('g:favstar_user') ? g:favstar_user : ''
   if len(user) == 0
     echohl WarningMsg
-    echo "Usage:"
-    echo "  :FavStar [user]"
-    echo "  you can set g:favstar_user to specify default user"
+    echo 'Usage:'
+    echo '  :FavStar [user]'
+    echo '  you can set g:favstar_user to specify default user'
     echohl None
     return
   endif
-  let url = "http://favstar.fm/users/".user."/recent"
+  let url = 'http://favstar.fm/users/'.user.'/recent'
   if len(a:bang) > 0
     try
       call OpenBrowser(url)
@@ -17,19 +17,19 @@ function! s:ShowFavStar(bang, user)
     return
   endif
   echohl WarningMsg
-  redraw | echo "fetching data..."
+  redraw | echo 'fetching data...'
   let res = webapi#http#get(url, '', {
   \ 'User-Agent': 'Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_2 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5'
   \})
  
   let res.content = iconv(res.content, 'utf-8', &encoding)
   let res.content = substitute(res.content, '<\(br\|meta\|link\|hr\)\s*>', '<\1/>', 'g')
-  redraw | echo "parsing data..."
+  redraw | echo 'parsing data...'
   let dom = webapi#xml#parse(res.content)
 
   let nodes = dom.findAll({'class': 'fs-tweet'})
   try
-    let pb = vim#widgets#progressbar#NewSimpleProgressBar("Processing:", len(nodes)) 
+    let pb = vim#widgets#progressbar#NewSimpleProgressBar('Processing:', len(nodes)) 
   catch /.*/
     let pb = {}
     function! pb.incr()
@@ -38,25 +38,26 @@ function! s:ShowFavStar(bang, user)
     endfunction
   endtry
 
-  redraw | echo ""
+  redraw | echo ''
   let favinfos = []
   for item in nodes
     let info = webapi#json#decode(item.attr['data-model'])
     let id = info['tweet_id']
-    let text = substitute(info['text'], "\n", " ", "g")
-    let text = substitute(text, "^ *", "", "")
-    let favinfo = {"text": text, "favs": [], "rts": [], "favcount": 0, "rtcount": 0}
+    let text = item.find('p', {'class': 'fs-tweet-text'}).value()
+    let text = substitute(text, "\n", ' ', 'g')
+    let text = substitute(text, '^ *', '', '')
+    let favinfo = {'text': text, 'favs': [], 'rts': [], 'favcount': 0, 'rtcount': 0}
     
-    let favs = item.find('div', {"data-type": "favs"})
+    let favs = item.find('div', {'data-type': 'favs'})
     if !empty(favs)
-      let favinfo.favcount = 0 + favs.find("li", {"class": "fs-total"}).value()
+      let favinfo.favcount = 0 + favs.find('li', {'class': 'fs-total'}).value()
       for f in favs.findAll('a')
         call add(favinfo.favs, f.attr['title'])
       endfor
     endif
-    let rts = item.find('div', {"data-type": "retweets"})
+    let rts = item.find('div', {'data-type': 'retweets'})
     if !empty(rts)
-      let favinfo.rtcount = 0 + rts.find("li", {"class": "fs-total"}).value()
+      let favinfo.rtcount = 0 + rts.find('li', {'class': 'fs-total'}).value()
       for f in rts.findAll('a')
         call add(favinfo.rts, f.attr['title'])
       endfor
@@ -71,33 +72,33 @@ function! s:ShowFavStar(bang, user)
     echo favinfo.text."\n"
     echohl None
     if len(favinfo.favs)
-      echon "FAV(".favinfo.favcount."):"
+      echon 'FAV('.favinfo.favcount.'):'
       for fav in favinfo.favs
         echohl Statement
-        echon " " . fav
+        echon ' ' . fav
         echohl None
       endfor
       if favinfo.favcount > len(favinfo.favs)
-        echon " ..."
+        echon ' ...'
       endif
-      echo ""
+      echo ''
     endif
     if len(favinfo.rts)
-      echon "RT(".favinfo.rtcount."):"
+      echon 'RT('.favinfo.rtcount.'):'
       for rt in favinfo.rts
         echohl Statement
-        echon " " . rt
+        echon ' ' . rt
         echohl None
       endfor
       if favinfo.rtcount > len(favinfo.rts)
-        echon " ..."
+        echon ' ...'
       endif
-      echo ""
+      echo ''
     endif
     echo "\n"
   endfor
 endfunction
 
-command! -nargs=? -bang FavStar call <SID>ShowFavStar("<bang>", <q-args>)
+command! -nargs=? -bang FavStar call <SID>ShowFavStar('<bang>', <q-args>)
 
 " vim:set et:
