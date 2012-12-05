@@ -54,8 +54,8 @@ function! s:ShowFavStar(bang, user)
     let text = item.find('p', {'class': 'fs-tweet-text'}).value()
     let text = substitute(text, "\n", ' ', 'g')
     let text = substitute(text, '^ *', '', '')
-    let favinfo = {'text': text, 'favs': [], 'rts': [], 'favcount': 0, 'rtcount': 0}
-    
+    let favinfo = {'text': webapi#html#decodeEntityReference(text), 'favs': [], 'rts': [], 'favcount': 0, 'rtcount': 0}
+
     let favs = item.find('div', {'data-type': 'favs'})
     if !empty(favs)
       let favinfo.favcount = 0 + favs.find('li', {'class': 'fs-total'}).value()
