@@ -1,5 +1,7 @@
-function! s:ShowFavStar(bang, user)
-  let user = len(a:user) > 0 ? a:user : exists('g:favstar_user') ? g:favstar_user : ''
+function! s:ShowFavStar(bang, ...)
+  let user = get(a:000, 0, '')
+  let tweet_id = get(a:000, 1, '')
+  let user = len(user) > 0 ? user : exists('g:favstar_user') ? g:favstar_user : ''
   if len(user) == 0
     echohl WarningMsg
     echo 'Usage:'
@@ -8,7 +10,11 @@ function! s:ShowFavStar(bang, user)
     echohl None
     return
   endif
-  let url = 'http://favstar.fm/users/'.user.'/recent'
+  if len(tweet_id) > 0
+    let url = 'http://favstar.fm/users/'.user.'/status/'.tweet_id
+  else
+    let url = 'http://favstar.fm/users/'.user.'/recent'
+  endif
   if len(a:bang) > 0
     try
       call OpenBrowser(url)
@@ -107,6 +113,6 @@ function! s:ShowFavStar(bang, user)
   endfor
 endfunction
 
-command! -nargs=? -bang FavStar call <SID>ShowFavStar('<bang>', <q-args>)
+command! -nargs=* -bang FavStar call <SID>ShowFavStar('<bang>', <f-args>)
 
 " vim:set et:
