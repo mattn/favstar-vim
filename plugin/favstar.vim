@@ -64,14 +64,14 @@ function! s:ShowFavStar(bang, ...)
 
     let favs = item.find('div', {'data-type': 'favs'})
     if !empty(favs)
-      let favinfo.favcount = 0 + favs.find('li', {'class': 'fs-total'}).value()
+      let favinfo.favcount = 0 + substitute(favs.find('li', {'class': 'fs-total'}).value(), ',' , '', 'g')
       for f in favs.findAll('a')
         call add(favinfo.favs, f.attr['title'])
       endfor
     endif
     let rts = item.find('div', {'data-type': 'retweets'})
     if !empty(rts)
-      let favinfo.rtcount = 0 + rts.find('li', {'class': 'fs-total'}).value()
+      let favinfo.rtcount = 0 + substitute(rts.find('li', {'class': 'fs-total'}).value(), ',' , '', 'g')
       for f in rts.findAll('a')
         call add(favinfo.rts, f.attr['title'])
       endfor
