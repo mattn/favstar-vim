@@ -37,6 +37,9 @@ function! s:ShowFavStar(bang, ...)
   endif
  
   let res.content = iconv(res.content, 'utf-8', &encoding)
+  let res.content = substitute(res.content, '<!--.\{-}-->', '', 'g')
+  let res.content = substitute(res.content, '<script[^>]*>.\{-}<\/script>', '', 'g')
+  let res.content = substitute(res.content, '.*\(<body[^>]*>.*</body>\).*', '\1', '')
   let res.content = substitute(res.content, '<\(br\|meta\|link\|hr\)\s*>', '<\1/>', 'g')
   redraw | echo 'parsing data...'
   let dom = webapi#xml#parse(res.content)
