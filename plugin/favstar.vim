@@ -58,7 +58,7 @@ function! s:ShowFavStar(bang, ...)
   redraw | echo ''
   let favinfos = []
   for item in nodes
-    let info = webapi#json#decode(item.attr['data-model'])
+    let info = webapi#json#decode(iconv(item.attr['data-model'], &encoding, "utf-8"))
     let id = info['tweet_id']
     let text = item.find('p', {'class': 'fs-tweet-text'}).value()
     let text = substitute(text, "\n", ' ', 'g')
