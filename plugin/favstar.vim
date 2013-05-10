@@ -31,7 +31,7 @@ function! s:ShowFavStar(bang, ...)
     redraw | echomsg 'server error'
     return
   endif
-  if res.header[0] !~ '200'
+  if res.status !~ '^2'
     redraw | echomsg res.header[0]
     return
   endif
